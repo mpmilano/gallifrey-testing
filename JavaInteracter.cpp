@@ -1,19 +1,23 @@
 #include <cstdio>
 #include <string>
+#include <thread>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <iostream>
+#include <functional>
 #include <ext/stdio_filebuf.h>
 
 class ChildProcess{
     struct initializer{
 	int use_for_out;
 	int use_for_in;
-	initializer(std::string process_name){
+	pid_t pid;
+	template<typename... Args>
+	initializer(std::string pname, Args&& ... pargs){
 	    using namespace std;
 	    int in_fd[2];
 	    int out_fd[2];
-	    pid_t pid;
 	    pipe(in_fd);
 	    pipe(out_fd);
 	    pid = fork();
@@ -25,7 +29,7 @@ class ChildProcess{
 		close(in_fd[1]);
 		dup2(in_fd[0], STDIN_FILENO);
 		close(in_fd[0]);
-		execl("/usr/bin/java", "Stdin", (char *) NULL);
+		execlp(pname.c_str(),pname.c_str(),std::string{pargs}.c_str()..., (char *) NULL);
 		throw "I thought this would end";
 	    }
 	    else if (pid == -1){
@@ -40,37 +44,64 @@ class ChildProcess{
 
     __gnu_cxx::stdio_filebuf<char> outbuf;
     __gnu_cxx::stdio_filebuf<char> inbuf;
-    
+    const pid_t child_pid;
     ChildProcess(initializer i):
 	outbuf(i.use_for_out,std::ios::out),
-	inbuf(i.use_for_in, std::ios::in) {}
+	inbuf(i.use_for_in, std::ios::in),
+	child_pid(i.pid),
+	block_until_dead([pid = i.pid, in = i.use_for_out,out = i.use_for_in]{
+			int status;
+			waitpid(pid, &status,0);
+			std::cout << "Java dead, closing files" << std::endl;
+			close(in);
+			close(out);
+		    })
+	{ }
+
     
 public:
-    std::ostream java_out{&outbuf};
-    std::istream java_in{&inbuf};
-    ChildProcess(std::string process_name):
-	ChildProcess(initializer(process_name)){}
+    ~ChildProcess() {outbuf.close(); inbuf.close();}
+    std::ostream out{&outbuf};
+    std::istream in{&inbuf};
+    template<typename... Args>
+    ChildProcess(std::string process_name, Args&&... args):
+	ChildProcess(initializer(process_name, std::forward<Args>(args)...)){
+    }
+
+    std::string read_to_string(){
+	using namespace std;
+	return string{(istreambuf_iterator<char>(in)), istreambuf_iterator<char>()};
+    }
+
+    bool child_alive(){
+	int status;
+	return waitpid(child_pid, &status, WNOHANG) == 0;
+    }
+
+    const std::function<void ()> block_until_dead;
 };
 
 int main(){
     using namespace std;
     std::cout << "running java" << std::endl;
-    FILE* fhandle = popen("java Stdin", "w");
+    ChildProcess java{"/usr/bin/java", "Stdin"};
     std::cout << "java started" << std::endl;
-    __gnu_cxx::stdio_filebuf<char> gnubuf(fhandle, std::ios::out);
-    std::basic_filebuf<char> *bbuf = &gnubuf;
-    std::ostream java_out(bbuf);
     std::cout << "bufs constructed" << std::endl;
     int num_java_pokes = 1232;
     for (int i = 0; i < num_java_pokes; ++i){
-	java_out.put(0);
-	java_out.put(0);
-	java_out.flush();
+	java.out.put(0);
+	java.out.put(0);
+	java.out.flush();
     }
-    java_out.put(1);
-    java_out.flush();
-    std::cout << "closing stream" << std::endl;
-    pclose(fhandle);
+    java.out.put(1);
+    java.out.flush();
+    std::cout << "java says: " << std::endl;
+    std::string line;
+    while (java.child_alive() && line != "%" && std::getline(java.in, line))
+    {
+	std::cout << line << std::endl;
+    }
+    java.block_until_dead();
 }
 
 

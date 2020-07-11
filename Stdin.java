@@ -13,5 +13,6 @@ public class Stdin{
 	catch (IOException closed){
 	}
 	System.out.println("Stream done, poked " + poke_counter + " times");
+	System.out.println("%");
     }
 }
