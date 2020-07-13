@@ -52,7 +52,6 @@ class ChildProcess{
 	block_until_dead([pid = i.pid, in = i.use_for_out,out = i.use_for_in]{
 			int status;
 			waitpid(pid, &status,0);
-			std::cout << "Java dead, closing files" << std::endl;
 			close(in);
 			close(out);
 		    })

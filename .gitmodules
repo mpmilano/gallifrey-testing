@@ -1,0 +1,6 @@
+[submodule "mutils"]
+	path = submodules/mutils
+	url = git@github.com:mpmilano/mutils
+[submodule "mutils-tasks"]
+	path = submodules/mutils-tasks
+	url = git@github.com:mpmilano/mutils-tasks
