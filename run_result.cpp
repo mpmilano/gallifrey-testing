@@ -23,9 +23,9 @@ void run_result::read(const time_t &test_start, std::istream &i) {
   std::string pre_abort_string;
   constexpr mutils::comma_space cs{};
   i.imbue(std::locale(i.getloc(), new mutils::comma_is_space()));
-  i >> start_offset >> cs >> stop_offset >> cs >> is_write  >>
-      cs >> is_abort >> cs >> pre_abort_string >> cs >> is_protocol_error >>
-      cs >> is_fatal_error >> cs >> slept_for >> cs >> desired_delay >> cs >>
+  i >> start_offset >> cs >> stop_offset >> cs >> is_write >> cs >> is_abort >>
+      cs >> pre_abort_string >> cs >> is_protocol_error >> cs >>
+      is_fatal_error >> cs >> slept_for >> cs >> desired_delay >> cs >>
       effective_delay >> cs;
   start_time = test_start + start_offset;
   stop_time = test_start + stop_offset;
@@ -44,4 +44,4 @@ std::istream &operator>>(std::istream &i, run_result &p) {
   return i;
 }
 
-} // namespace myria
+} // namespace testing

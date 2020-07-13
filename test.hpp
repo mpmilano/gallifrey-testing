@@ -4,30 +4,27 @@
 #include "mutils-tasks/ctpl_stl.h"
 #include "run_result.hpp"
 #include "test_utils.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using something_for_frontend_env = int;
 using ProtocolException = int;
 
 namespace testing {
 
-    template <typename Internals> struct test;
-    
-    template <typename Internals> class client {
-    public:
-	
-	using test = ::testing::test<Internals>;
+template <typename Internals> struct test;
+
+template <typename Internals> class client {
+public:
+  using test = ::testing::test<Internals>;
 
   test &t;
   Internals i{*this};
 
   template <typename s>
-  client(test &t, s &&something_for_frontend_env)
-      : t(t) {}
+  client(test &t, s &&something_for_frontend_env) : t(t) {}
 
   std::unique_ptr<run_result> &client_action(std::unique_ptr<run_result> &);
-	
 };
 
 template <typename Internals> struct test {
@@ -35,13 +32,11 @@ template <typename Internals> struct test {
 
   using client = ::testing::client<Internals>;
 
-    
-
   moodycamel::BlockingConcurrentQueue<std::unique_ptr<client>> client_queue;
   std::atomic<std::size_t> number_enqueued_clients{0};
   void push_client() {
-    client_queue.enqueue(std::make_unique<client>(
-			     *this,something_for_frontend_env{}));
+    client_queue.enqueue(
+        std::make_unique<client>(*this, something_for_frontend_env{}));
     ++number_enqueued_clients;
   }
   ctpl::thread_pool tp{
@@ -67,10 +62,8 @@ template <typename Internals> struct test {
 
   using pending_result = std::future<std::unique_ptr<run_result>>;
   template <typename timeout, typename time>
-  void process_results(
-      moodycamel::ConcurrentQueue<pending_result>
-          &results,
-      timeout delay, time next_event_time, time start_time) {
+  void process_results(moodycamel::ConcurrentQueue<pending_result> &results,
+                       timeout delay, time next_event_time, time start_time) {
     pending_result it;
     while (next_event_time > now() && results.try_dequeue(it)) {
       if (it.wait_for(delay) != std::future_status::timeout) {
@@ -98,10 +91,12 @@ template <typename Internals> struct test {
   }
 
   template <typename time>
-      void print_results(const time &start_time, const std::vector<run_result> &rs) {
-      for (const auto &r : rs) print_result(start_time, r);
+  void print_results(const time &start_time,
+                     const std::vector<run_result> &rs) {
+    for (const auto &r : rs)
+      print_result(start_time, r);
   }
-  
+
   void run_test() {
     using namespace std;
     using namespace chrono;
@@ -149,12 +144,10 @@ template <typename Internals> struct test {
     }
     output_file.flush();
   }
-  
+
   template <typename time>
-  void launcher_loop(
-      moodycamel::ConcurrentQueue<pending_result>
-          &results,
-      time start_time, std::size_t parallel_factor) {
+  void launcher_loop(moodycamel::ConcurrentQueue<pending_result> &results,
+                     time start_time, std::size_t parallel_factor) {
     using namespace std;
     using namespace chrono;
     using namespace mutils;
@@ -209,9 +202,12 @@ template <typename Internals> struct test {
           ret->effective_delay = duration_cast<microseconds>(effective_delay);
           ret->slept_for = duration_cast<microseconds>(slept_for);
           ret->start_time = this_event_time;
+          ret->stop_time = this_event_time - 1s;
         }
         try {
           client_ptr->client_action(ret);
+          if (ret && ret->stop_time < ret->start_time)
+            ret->stop_time = high_resolution_clock::now();
           client_queue.enqueue(std::unique_ptr<client>(std::move(client_ptr)));
           cln.cleanup_required = false;
         } catch (const ProtocolException &) {
@@ -229,6 +225,5 @@ template <typename Internals> struct test {
     }
   }
 };
-
 
 } // namespace testing

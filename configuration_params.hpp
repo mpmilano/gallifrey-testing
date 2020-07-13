@@ -10,19 +10,13 @@ namespace testing {
 
 struct configuration_parameters {
   // required values
-    int strong_ip{0};
-    int strong_relay_port{0};
-  int causal_ip{0};
-  int causal_relay_port{0};
-    mutils::Frequency client_freq{0};
+  mutils::Frequency client_freq{0};
   std::size_t starting_num_clients{0};
-    mutils::Frequency increase_clients_freq{0};
-    std::chrono::seconds test_duration{0};
+  mutils::Frequency increase_clients_freq{0};
+  std::chrono::seconds test_duration{0};
   double percent_dedicated_connections{0};
-  double percent_causal{0};
-  double percent_read{0};
-    std::string output_file;
-    std::chrono::seconds log_delay_tolerance{0};
+  std::string output_file;
+  std::chrono::seconds log_delay_tolerance{0};
   unsigned short log_every_n{0};
   unsigned short parallel_factor{0};
 
@@ -57,4 +51,4 @@ std::ostream &operator<<(std::ostream &o, const configuration_parameters &p);
 std::istream &operator>>(std::istream &i, configuration_parameters &p);
 
 void read_from_args(configuration_parameters &params, char **args);
-} // namespace myria
+} // namespace testing

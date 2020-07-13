@@ -28,4 +28,4 @@ using run_result_details::run_result;
 
 std::istream &operator>>(std::istream &i, run_result &p);
 
-} // namespace myria
+} // namespace testing
