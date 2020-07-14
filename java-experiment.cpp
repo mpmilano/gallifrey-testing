@@ -51,8 +51,18 @@ int main(int argc, char **argv) {
   testing::configuration_parameters params;
   std::cin >> params;
   std::cout << "testing params: " << params << std::endl;
-  for (auto i = 0u; i < params.max_clients(); ++i)
-	  javap.enqueue(std::make_unique<ChildProcess>(environment_overrides{}, "java", java_name));
+  environment_overrides hardcoded_envs[4];
+  hardcoded_envs[0].overrides["ANTIDOTE_HOST"] = "pinky11.mpi-sws.org";
+  hardcoded_envs[0].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky11.mpi-sws.org/JavaBackend";
+  hardcoded_envs[1].overrides["ANTIDOTE_HOST"] = "pinky13.mpi-sws.org";
+  hardcoded_envs[1].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky13.mpi-sws.org/JavaBackend";
+  hardcoded_envs[2].overrides["ANTIDOTE_HOST"] = "pinky14.mpi-sws.org";
+  hardcoded_envs[2].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky14.mpi-sws.org/JavaBackend";
+  hardcoded_envs[3].overrides["ANTIDOTE_HOST"] = "pinky19.mpi-sws.org";
+  hardcoded_envs[3].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky19.mpi-sws.org/JavaBackend";
+  for (auto i = 0u; i < params.max_clients(); ++i){
+	  javap.enqueue(std::make_unique<ChildProcess>(hardcoded_envs[i % 4], "java", java_name, "/home/isheff/Documents/gallifrey/gallifrey-testing/shared-counter", "/local/isheff/logs/experiment-2020-07-14-18:30:01/client-" + std::to_string(i) + ".log"));
+  }
   test t1{params};
   std::unique_ptr<testing::run_result> nullp;
   std::cout << "running initial action" << std::endl;
