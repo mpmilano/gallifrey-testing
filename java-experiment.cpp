@@ -1,23 +1,28 @@
 #include "test.hpp"
 #include "ChildProcess.hpp"
+#include "mutils-tasks/blockingconcurrentqueue.h"
 #include <thread>
 
 using namespace std::chrono;
 
 std::string java_name;
 
+moodycamel::BlockingConcurrentQueue<std::unique_ptr<ChildProcess>> javap;
+
 struct child_process_test {
-    ChildProcess java{"java", java_name};
-  template <typename... T> child_process_test(const T &...) {}
+	std::unique_ptr<ChildProcess> java;
+  template <typename... T> child_process_test(const T &...) {
+	  javap.wait_dequeue(java);
+  }
     ~child_process_test(){
-	java.out.put(1); java.out.put(1);
+	java->out.put(1); java->out.put(1);
     }
 
     std::unique_ptr<testing::run_result> & action(std::unique_ptr<testing::run_result> & result){
-	java.out.put(0); java.out.put(0); 
-	java.out.flush();
+	java->out.put(0); java->out.put(0); 
+	java->out.flush();
 	char recv;
-	java.in >> recv;
+	java->in >> recv;
 	assert(recv == 0);
 	return result;
     }
@@ -43,6 +48,7 @@ int main(int argc, char **argv) {
   testing::configuration_parameters params;
   std::cin >> params;
   std::cout << "testing params: " << params << std::endl;
+  for (auto i = 0u; i < params.max_clients(); ++i) javap.enqueue(std::make_unique<ChildProcess>("java",java_name));
   test t1{params};
   std::unique_ptr<testing::run_result> nullp;
   std::cout << "running initial action" << std::endl;
