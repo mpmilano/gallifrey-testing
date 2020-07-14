@@ -8,7 +8,7 @@ std::size_t configuration_parameters::max_clients() const {
 }
 
 std::size_t configuration_parameters::num_dedicated_connections() const {
-  return max_clients() * percent_dedicated_connections;
+  return max_clients() * percent_read;
 }
 
 std::size_t configuration_parameters::num_spare_connections() const {
@@ -21,7 +21,7 @@ bool same_run(const configuration_parameters &p1,
          p1.starting_num_clients == p2.starting_num_clients &&
          p1.increase_clients_freq == p2.increase_clients_freq &&
          p1.test_duration == p2.test_duration &&
-         p1.percent_dedicated_connections == p2.percent_dedicated_connections &&
+         p1.percent_read == p2.percent_read &&
          p1.log_every_n == p2.log_every_n &&
          p1.parallel_factor == p2.parallel_factor;
 }
@@ -31,7 +31,7 @@ std::ostream &operator<<(std::ostream &o, const configuration_parameters &p) {
   constexpr mutils::comma_space cs{};
   return o << p.client_freq << cs << p.starting_num_clients << cs
            << p.increase_clients_freq << cs << p.test_duration << cs
-           << p.percent_dedicated_connections << cs << p.output_file << cs
+           << p.percent_read << cs << p.output_file << cs
            << p.log_delay_tolerance << cs << p.log_every_n << cs
            << p.parallel_factor;
 }
@@ -42,7 +42,7 @@ std::istream &operator>>(std::istream &i, configuration_parameters &p) {
   constexpr mutils::comma_space cs{};
   i >> p.client_freq >> cs >> p.starting_num_clients >> cs >>
       p.increase_clients_freq >> cs >> p.test_duration >> cs >>
-      p.percent_dedicated_connections >> cs >> p.output_file >> cs >>
+      p.percent_read >> cs >> p.output_file >> cs >>
       p.log_delay_tolerance >> cs >> p.log_every_n >> cs >> p.parallel_factor;
   return i;
 } //*/
@@ -73,9 +73,9 @@ void read_from_args(configuration_parameters &params, char **args) {
   }
   {
     std::istringstream ss{std::string{args[8]}};
-    std::cout << "percent_dedicated_connections decoding: " << args[8]
+    std::cout << "percent_read decoding: " << args[8]
               << std::endl;
-    ss >> params.percent_dedicated_connections;
+    ss >> params.percent_read;
   }
   {
     std::cout << "output_file decoding: " << args[11] << std::endl;

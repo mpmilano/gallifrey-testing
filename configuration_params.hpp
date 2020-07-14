@@ -14,7 +14,7 @@ struct configuration_parameters {
   std::size_t starting_num_clients{0};
   mutils::Frequency increase_clients_freq{0};
   std::chrono::seconds test_duration{0};
-  double percent_dedicated_connections{0};
+  double percent_read{0};
   std::string output_file;
   std::chrono::seconds log_delay_tolerance{0};
   unsigned short log_every_n{0};
