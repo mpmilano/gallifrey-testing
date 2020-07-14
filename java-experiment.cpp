@@ -21,9 +21,14 @@ struct child_process_test {
 
   std::unique_ptr<testing::run_result> &
   action(std::unique_ptr<testing::run_result> &result, double read_percent) {
-      if (mutils::better_rand() < read_percent)
-	  java->out.put(1);
-      else java->out.put(0);
+    if (mutils::better_rand() < read_percent){
+      if (result) result->is_write = false;
+      java->out.put(1);
+    }
+    else {
+      if (result) result->is_write = true;
+      java->out.put(0);
+    }
     java->out.flush();
     char recv;
     java->in >> recv;
