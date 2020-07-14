@@ -16,7 +16,7 @@ namespace testing {
 template <>
 std::unique_ptr<run_result> &testing::client<empty_test>::client_action(
     std::unique_ptr<run_result> &result) {
-	std::this_thread::sleep_for(3ms);
+  std::this_thread::sleep_for(3ms);
   return result;
 }
 

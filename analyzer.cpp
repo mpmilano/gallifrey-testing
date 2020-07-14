@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   milliseconds segment_duration_goal;
   arg3 >> segment_duration_goal;
   std::cout << "Segment duration goal: " << segment_duration_goal << std::endl
-	    << "Increment fraction: " << increment_fraction << std::endl;
+            << "Increment fraction: " << increment_fraction << std::endl;
   for (std::size_t i = 0; i < results.size();) {
     std::size_t bin_size{0};
     auto segment_start_time = results[i].stop_time;

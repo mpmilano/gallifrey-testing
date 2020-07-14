@@ -1,3 +1,4 @@
+#include "ChildProcess.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <ext/stdio_filebuf.h>
@@ -7,9 +8,6 @@
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
-#include "ChildProcess.hpp"
-
-
 
 int main() {
   using namespace std;
