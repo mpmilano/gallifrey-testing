@@ -15,14 +15,15 @@ struct child_process_test {
     javap.wait_dequeue(java);
   }
   ~child_process_test() {
-    java->out.put(1);
-    java->out.put(1);
+      java->out.put(2);
+      java->out.put(2);
   }
 
   std::unique_ptr<testing::run_result> &
-  action(std::unique_ptr<testing::run_result> &result) {
-    java->out.put(0);
-    java->out.put(0);
+  action(std::unique_ptr<testing::run_result> &result, double read_percent) {
+      if (mutils::better_rand() < read_percent)
+	  java->out.put(1);
+      else java->out.put(0);
     java->out.flush();
     char recv;
     java->in >> recv;
@@ -40,7 +41,7 @@ namespace testing {
 template <>
 std::unique_ptr<run_result> &testing::client<child_process_test>::client_action(
     std::unique_ptr<run_result> &result) {
-  return i.action(result);
+    return i.action(result, read_percent);
 }
 
 } // namespace testing

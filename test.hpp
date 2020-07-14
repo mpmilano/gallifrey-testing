@@ -7,7 +7,6 @@
 #include <fstream>
 #include <iostream>
 
-using something_for_frontend_env = int;
 using ProtocolException = int;
 
 namespace testing {
@@ -20,9 +19,9 @@ public:
 
   test &t;
   Internals i{*this};
+    const double read_percent;
 
-  template <typename s>
-  client(test &t, s &&something_for_frontend_env) : t(t) {}
+  client(test &t, double read_percent) : t(t),read_percent(read_percent) {}
 
   std::unique_ptr<run_result> &client_action(std::unique_ptr<run_result> &);
 };
@@ -36,7 +35,7 @@ template <typename Internals> struct test {
   std::atomic<std::size_t> number_enqueued_clients{0};
   void push_client() {
     client_queue.enqueue(
-        std::make_unique<client>(*this, something_for_frontend_env{}));
+        std::make_unique<client>(*this, params.percent_read));
     ++number_enqueued_clients;
   }
   ctpl::thread_pool tp{
