@@ -15,7 +15,7 @@ using std::string;
 ChildProcess::initializer::initializer(const environment_overrides &e,
                                        const std::string &pname,
                                        std::vector<string> pargs) {
-  assert(pargs.size() < 6);
+  assert(pargs.size() < 7);
   using namespace std;
 
   struct env_manip {
@@ -69,6 +69,11 @@ ChildProcess::initializer::initializer(const environment_overrides &e,
     case 5:
       execlp(pname.c_str(), pname.c_str(), pargs[0].c_str(), pargs[1].c_str(),
              pargs[2].c_str(), pargs[3].c_str(), pargs[4].c_str(),
+             (char *)NULL);
+      break;
+    case 6:
+      execlp(pname.c_str(), pname.c_str(), pargs[0].c_str(), pargs[1].c_str(),
+             pargs[2].c_str(), pargs[3].c_str(), pargs[4].c_str(),pargs[5].c_str(),
              (char *)NULL);
       break;
     default:
