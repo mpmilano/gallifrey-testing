@@ -40,7 +40,7 @@ template <typename Internals> struct test {
     ++number_enqueued_clients;
   }
   ctpl::thread_pool tp{
-      (int)std::max(params.max_clients() / 2, params.starting_num_clients)};
+      (int)std::max(params.max_clients(), params.starting_num_clients)};
 
   test(configuration_parameters params) : params(params) {
     output_file << params << std::endl;

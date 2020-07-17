@@ -5,7 +5,7 @@ public class Stdin2{
 	System.err.println("java initialized");
 	int poke_counter = 0;
 	try {
-	    int sleep_amnt = 50;
+	    int sleep_amnt = 40;
 	    while (System.in.read() == 0){
 		System.in.read();
 		++poke_counter;
