@@ -23,7 +23,8 @@ ChildProcess::initializer::initializer(const environment_overrides &e,
 	  std::map<string, string> oe;
     env_manip(const environment_overrides &e) : e(e) {
       for (const auto &p : e.overrides) {
-        oe[p.first] = getenv(p.second.c_str());
+	char* old_val = getenv(p.second.c_str());
+	if (old_val) oe.emplace(p.first,std::string{old_val});
         setenv(p.first.c_str(),p.second.c_str(),1);
       }
     }
@@ -33,6 +34,8 @@ ChildProcess::initializer::initializer(const environment_overrides &e,
       }
     }
   };
+
+  env_manip manip_env{e};
 
   int in_fd[2];
   int out_fd[2];

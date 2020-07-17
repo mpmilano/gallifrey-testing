@@ -136,7 +136,7 @@ template <typename Internals> struct test {
       std::cout << "exception thrown: aborting" << std::endl;
     }
     for (std::size_t i = 0; i < 20 && results.size_approx() > 0; ++i) {
-      this_thread::sleep_for(1s);
+      this_thread::sleep_for(10ms);
       std::cout << "waiting for: " << results.size_approx() << std::endl;
       std::cout.flush();
       process_results(results, 1ms, now() + 100s, start_time);

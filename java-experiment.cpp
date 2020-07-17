@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
   hardcoded_envs[3].overrides["ANTIDOTE_HOST"] = "pinky19.mpi-sws.org";
   hardcoded_envs[3].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky19.mpi-sws.org/JavaBackend";
   for (auto i = 0u; i < params.max_clients(); ++i){
-	  javap.enqueue(std::make_unique<ChildProcess>(hardcoded_envs[i % 4], "java", "-cp", "/home/isheff/Documents/gallifrey/gallifreyc/tests/out:/home/isheff/Documents/gallifrey/gallifrey-antidote/full-runtime.jar", java_name, "/home/isheff/Documents/gallifrey/gallifrey-testing/shared-counter", "/local/isheff/logs/experiment-2020-07-14-18:30:01/client-" + std::to_string(i) + ".log"));
+	  javap.enqueue(std::make_unique<ChildProcess>(hardcoded_envs[i % 4], "java", "-cp", "/home/isheff/Documents/gallifrey/gallifreyc/tests/out:/home/isheff/Documents/gallifrey/gallifrey-antidote/full-runtime.jar", java_name, "/home/isheff/Documents/gallifrey/gallifrey-testing/shared-counter", "/local/isheff/logs/experiment-2020-07-14-22:50:06/client-" + std::to_string(i) + ".log"));
   }
   test t1{params};
   std::unique_ptr<testing::run_result> nullp;
