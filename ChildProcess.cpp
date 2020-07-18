@@ -3,41 +3,44 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ext/stdio_filebuf.h>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <string>
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
-#include <fstream>
 
 using std::string;
 
-std::vector<environment_overrides> envs_from_file(const std::string &filename){
-  std::fstream in(filename,std::ios::in);
+std::vector<environment_overrides> envs_from_file(const std::string &filename) {
+  std::fstream in(filename, std::ios::in);
   std::vector<environment_overrides> ret;
-  while (in){
+  while (in) {
     ret.emplace_back(in);
   }
-  if (ret.back().overrides.size() == 0) ret.pop_back();
+  if (ret.back().overrides.size() == 0)
+    ret.pop_back();
   return ret;
 }
 
-environment_overrides::environment_overrides(const string& filename)
-  :environment_overrides(*std::make_unique<std::fstream>(filename,std::ios::in)){}
+environment_overrides::environment_overrides(const string &filename)
+    : environment_overrides(
+          *std::make_unique<std::fstream>(filename, std::ios::in)) {}
 
-environment_overrides::environment_overrides(std::istream& source){
-  while (source){
+environment_overrides::environment_overrides(std::istream &source) {
+  while (source) {
     if (source.peek() == '%') {
-      source.get(); source.get();
+      source.get();
+      source.get();
       break;
     }
     std::string var;
-    getline(source,var,'=');
-    if (var.size() > 0){
+    getline(source, var, '=');
+    if (var.size() > 0) {
       std::string val;
-      getline(source,val);
-      overrides.emplace(var,val);
+      getline(source, val);
+      overrides.emplace(var, val);
     }
   }
 }
@@ -50,17 +53,18 @@ ChildProcess::initializer::initializer(const environment_overrides &e,
 
   struct env_manip {
     const environment_overrides &e;
-	  std::map<string, string> oe;
+    std::map<string, string> oe;
     env_manip(const environment_overrides &e) : e(e) {
       for (const auto &p : e.overrides) {
-	char* old_val = getenv(p.second.c_str());
-	if (old_val) oe.emplace(p.first,std::string{old_val});
-        setenv(p.first.c_str(),p.second.c_str(),1);
+        char *old_val = getenv(p.second.c_str());
+        if (old_val)
+          oe.emplace(p.first, std::string{old_val});
+        setenv(p.first.c_str(), p.second.c_str(), 1);
       }
     }
     ~env_manip() {
       for (const auto &p : oe) {
-	      setenv(p.first.c_str(),p.second.c_str(),1);
+        setenv(p.first.c_str(), p.second.c_str(), 1);
       }
     }
   };
@@ -106,8 +110,8 @@ ChildProcess::initializer::initializer(const environment_overrides &e,
       break;
     case 6:
       execlp(pname.c_str(), pname.c_str(), pargs[0].c_str(), pargs[1].c_str(),
-             pargs[2].c_str(), pargs[3].c_str(), pargs[4].c_str(),pargs[5].c_str(),
-             (char *)NULL);
+             pargs[2].c_str(), pargs[3].c_str(), pargs[4].c_str(),
+             pargs[5].c_str(), (char *)NULL);
       break;
     default:
       break;

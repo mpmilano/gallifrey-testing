@@ -19,9 +19,9 @@ public:
 
   test &t;
   Internals i{*this};
-    const double read_percent;
+  const double read_percent;
 
-  client(test &t, double read_percent) : t(t),read_percent(read_percent) {}
+  client(test &t, double read_percent) : t(t), read_percent(read_percent) {}
 
   std::unique_ptr<run_result> &client_action(std::unique_ptr<run_result> &);
 };
@@ -34,8 +34,7 @@ template <typename Internals> struct test {
   moodycamel::BlockingConcurrentQueue<std::unique_ptr<client>> client_queue;
   std::atomic<std::size_t> number_enqueued_clients{0};
   void push_client() {
-    client_queue.enqueue(
-        std::make_unique<client>(*this, params.percent_read));
+    client_queue.enqueue(std::make_unique<client>(*this, params.percent_read));
     ++number_enqueued_clients;
   }
   ctpl::thread_pool tp{
@@ -129,10 +128,10 @@ template <typename Internals> struct test {
             last_log_write_time = now();
           }
         }
-	std::cout << "ending test thread... ";
-	std::cout.flush();
+        std::cout << "ending test thread... ";
+        std::cout.flush();
         e.get();
-	std::cout << "ended" << std::endl;
+        std::cout << "ended" << std::endl;
       }
     } catch (...) {
       // Looks like we have failed to initialize our connections.

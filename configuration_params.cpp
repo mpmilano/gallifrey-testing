@@ -42,8 +42,8 @@ std::istream &operator>>(std::istream &i, configuration_parameters &p) {
   constexpr mutils::comma_space cs{};
   i >> p.client_freq >> cs >> p.starting_num_clients >> cs >>
       p.increase_clients_freq >> cs >> p.test_duration >> cs >>
-      p.percent_read >> cs >> p.output_file >> cs >>
-      p.log_delay_tolerance >> cs >> p.log_every_n >> cs >> p.parallel_factor;
+      p.percent_read >> cs >> p.output_file >> cs >> p.log_delay_tolerance >>
+      cs >> p.log_every_n >> cs >> p.parallel_factor;
   return i;
 } //*/
 
@@ -73,8 +73,7 @@ void read_from_args(configuration_parameters &params, char **args) {
   }
   {
     std::istringstream ss{std::string{args[8]}};
-    std::cout << "percent_read decoding: " << args[8]
-              << std::endl;
+    std::cout << "percent_read decoding: " << args[8] << std::endl;
     ss >> params.percent_read;
   }
   {
