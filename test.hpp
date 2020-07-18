@@ -129,12 +129,16 @@ template <typename Internals> struct test {
             last_log_write_time = now();
           }
         }
+	std::cout << "ending test thread... ";
+	std::cout.flush();
         e.get();
+	std::cout << "ended" << std::endl;
       }
     } catch (...) {
       // Looks like we have failed to initialize our connections.
       std::cout << "exception thrown: aborting" << std::endl;
     }
+    std::cout << "all threads ended" << std::endl;
     for (std::size_t i = 0; i < 20 && results.size_approx() > 0; ++i) {
       this_thread::sleep_for(10ms);
       std::cout << "waiting for: " << results.size_approx() << std::endl;

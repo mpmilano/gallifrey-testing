@@ -9,12 +9,42 @@
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
+#include <fstream>
 
 using std::string;
 
+std::vector<environment_overrides> envs_from_file(const std::string &filename){
+  std::fstream in(filename,std::ios::in);
+  std::vector<environment_overrides> ret;
+  while (in){
+    ret.emplace_back(in);
+  }
+  if (ret.back().overrides.size() == 0) ret.pop_back();
+  return ret;
+}
+
+environment_overrides::environment_overrides(const string& filename)
+  :environment_overrides(*std::make_unique<std::fstream>(filename,std::ios::in)){}
+
+environment_overrides::environment_overrides(std::istream& source){
+  while (source){
+    if (source.peek() == '%') {
+      source.get(); source.get();
+      break;
+    }
+    std::string var;
+    getline(source,var,'=');
+    if (var.size() > 0){
+      std::string val;
+      getline(source,val);
+      overrides.emplace(var,val);
+    }
+  }
+}
+
 ChildProcess::initializer::initializer(const environment_overrides &e,
                                        const std::string &pname,
-                                       std::vector<string> pargs) {
+                                       const std::vector<string> &pargs) {
   assert(pargs.size() < 7);
   using namespace std;
 

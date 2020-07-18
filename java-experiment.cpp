@@ -52,22 +52,20 @@ std::unique_ptr<run_result> &testing::client<child_process_test>::client_action(
 } // namespace testing
 
 int main(int argc, char **argv) {
-  assert(argc > 1);
-  java_name = argv[1];
+  //args: arg1: environment file.  args 2-∞: passed to child process.
+  assert(argc > 2);
+  
+  java_name = argv[2];
   testing::configuration_parameters params;
   std::cin >> params;
   std::cout << "testing params: " << params << std::endl;
-  environment_overrides hardcoded_envs[4];
-  hardcoded_envs[0].overrides["ANTIDOTE_HOST"] = "pinky11.mpi-sws.org";
-  hardcoded_envs[0].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky11.mpi-sws.org/JavaBackend";
-  hardcoded_envs[1].overrides["ANTIDOTE_HOST"] = "pinky13.mpi-sws.org";
-  hardcoded_envs[1].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky13.mpi-sws.org/JavaBackend";
-  hardcoded_envs[2].overrides["ANTIDOTE_HOST"] = "pinky14.mpi-sws.org";
-  hardcoded_envs[2].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky14.mpi-sws.org/JavaBackend";
-  hardcoded_envs[3].overrides["ANTIDOTE_HOST"] = "pinky19.mpi-sws.org";
-  hardcoded_envs[3].overrides["ANTIDOTE_BACKEND"] = "rmi://pinky19.mpi-sws.org/JavaBackend";
+  auto hardcoded_envs = envs_from_file(argv[1]);
+  std::cout << "loaded " << hardcoded_envs.size() << " envs" << std::endl;
+  if (hardcoded_envs.size() == 0) hardcoded_envs.emplace_back();
   for (auto i = 0u; i < params.max_clients(); ++i){
-	  javap.enqueue(std::make_unique<ChildProcess>(hardcoded_envs[i % 4], "java", "-cp", "/home/isheff/Documents/gallifrey/gallifreyc/tests/out:/home/isheff/Documents/gallifrey/gallifrey-antidote/full-runtime.jar", java_name, "/home/isheff/Documents/gallifrey/gallifrey-testing/shared-counter", "/local/isheff/logs/experiment-2020-07-14-22:50:06/client-" + std::to_string(i) + ".log"));
+    auto this_env = hardcoded_envs[i % hardcoded_envs.size()];
+    this_env.overrides.emplace("TASK_ID",std::to_string(i));
+    javap.enqueue(std::make_unique<ChildProcess>(this_env, argv[2], argv + 3, argc-3));
   }
   test t1{params};
   std::unique_ptr<testing::run_result> nullp;

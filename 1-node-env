@@ -1,0 +1,2 @@
+ANTIDOTE_HOST=pinky11.mpi-sws.org
+ANTIDOTE_BACKEND=rmi://pinky11.mpi-sws.org/JavaBackend
