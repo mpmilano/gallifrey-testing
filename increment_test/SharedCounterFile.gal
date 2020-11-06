@@ -1,0 +1,30 @@
+package increment_test;
+import java.util.*;
+import java.io.*;
+
+public class SharedCounterFile {
+
+    private static class WrappedSharedCounter implements Serializable{
+	public final shared[RCounter] Counter c;
+	public WrappedSharedCounter(shared[RCounter] Counter c){
+	    this.c = c;
+	}
+    }
+    
+    public static final String PATH = "/tmp/gallifrey-experiment-file";
+    public final shared[RCounter] Counter c;
+    
+
+    public SharedCounterFile() throws IOException, ClassNotFoundException{
+	File f = new File(PATH);
+	if (f.exists()){
+	    assert f.canRead();
+	    this.c = ((WrappedSharedCounter)(new ObjectInputStream(new FileInputStream(f))).readObject()).c;
+	}
+	else {
+	    this.c = new Counter(0);
+	    f.createNewFile();
+	    (new ObjectOutputStream(new FileOutputStream(f))).writeObject(new WrappedSharedCounter(this.c));
+	}
+    }
+}
