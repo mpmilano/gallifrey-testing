@@ -1,6 +1,7 @@
 /**
  * Counter
  */
+
 public class Counter {
 
     Integer count;

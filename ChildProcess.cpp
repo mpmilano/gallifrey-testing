@@ -6,6 +6,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <future>
 #include <string>
 #include <sys/wait.h>
 #include <thread>
@@ -43,6 +44,29 @@ environment_overrides::environment_overrides(std::istream &source) {
       overrides.emplace(var, val);
     }
   }
+}
+
+template<class Rep, class Period>
+void wait_for_child(const pid_t child_pid, const std::chrono::duration<Rep,Period>& timeout_duration){
+    using namespace std;
+    using namespace chrono;
+    auto start = high_resolution_clock::now();
+    int status;
+    int waitpid_res = 0;
+    do {
+	waitpid_res = waitpid(child_pid, &status, WNOHANG);
+	if (waitpid_res == -1){
+	    switch (errno){
+	    case ECHILD: break;
+	    case EINTR:
+		waitpid_res = 0;
+	    default:break;
+	    }
+	}
+	if (WIFEXITED(status)) return;
+	this_thread::sleep_for(timeout_duration/100);
+    }
+    while (waitpid_res == 0 && (high_resolution_clock::now() - start) <= timeout_duration);
 }
 
 ChildProcess::initializer::initializer(const environment_overrides &e,
@@ -137,8 +161,11 @@ ChildProcess::ChildProcess(initializer i)
       }) {}
 
 ChildProcess::~ChildProcess() {
+    using namespace std::chrono;
   outbuf.close();
   inbuf.close();
+  wait_for_child(child_pid,1s);
+  if (child_alive()) kill(child_pid,SIGTERM);
 }
 
 std::string ChildProcess::read_to_string() {

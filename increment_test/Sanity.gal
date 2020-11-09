@@ -1,0 +1,9 @@
+public class Sanity{
+    public static void main(String[] args) throws Throwable {
+	SharedCounterFile scf = new SharedCounterFile();
+	System.out.println("Counter value is " + scf.c.value());
+	scf.c.increment(5);
+	System.out.println("Counter value is " + scf.c.value());
+	scf.c.decrement(5);
+    }
+}

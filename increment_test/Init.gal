@@ -1,0 +1,6 @@
+public class Init{
+    public static void main(String[] args) throws Throwable {
+	SharedCounterFile scf = new SharedCounterFile();
+	System.out.println("Counter value is " + scf.c.value());
+    }
+}

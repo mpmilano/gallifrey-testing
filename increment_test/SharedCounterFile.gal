@@ -1,4 +1,3 @@
-package increment_test;
 import java.util.*;
 import java.io.*;
 
@@ -11,7 +10,7 @@ public class SharedCounterFile {
 	}
     }
     
-    public static final String PATH = "/tmp/gallifrey-experiment-file";
+    public static String PATH = "/tmp/gallifrey-experiment-file";
     public final shared[RCounter] Counter c;
     
 

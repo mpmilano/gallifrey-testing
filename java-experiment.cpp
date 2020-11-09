@@ -75,5 +75,4 @@ int main(int argc, char **argv) {
   std::cout << "running initial action" << std::endl;
   // child_process_test{}.action(nullp);
   t1.run_test();
-  exit(0);
 }
