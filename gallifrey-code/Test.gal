@@ -1,0 +1,4 @@
+public interface Test{
+    public void write_requested();
+    public void read_requested();
+}

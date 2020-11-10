@@ -1,0 +1,27 @@
+import java.util.*;
+import java.io.*;
+
+public class TestRunner implements Runnable{
+    private final Test t;
+    private final File logfile;
+    public TestRunner(Test t, File logfile){
+	this.t = t;
+	this.logfile = logfile;
+    }
+
+    public void run(){
+	try {
+	    do{
+		int read = System.in.read();
+		if (read == 2 || read == '2') return;
+		else if (read == 0 || read == '0') t.read_requested();
+		else if (read == 1 || read == '1') t.write_requested();
+		else throw new IOException("protocol error!");
+		System.out.write(0);
+		System.out.flush();;
+	    } while(true);
+	} catch(IOException e){
+	    System.err.println("ERROR: subprocessing exits on IO exception");
+	}
+    }
+}

@@ -1,0 +1,21 @@
+import java.io.*;
+
+public class SimpleTest implements Test{
+    final SharedCounterFile scf;
+
+    public SimpleTest() throws IOException{
+	this.scf = new SharedCounterFile();
+    }
+    
+    @Override
+    public void write_requested(){
+	scf.c.increment(1);
+    }
+    @Override
+    public void read_requested(){
+	scf.c.value();
+    }
+    public static void main(String[] args) throws IOException {
+	(new TestRunner(new SimpleTest(), new File("/tmp/discard"))).run();
+    }
+}
