@@ -11,17 +11,31 @@ public class TestRunner implements Runnable{
 
     public void run(){
 	try {
-	    do{
-		int read = System.in.read();
-		if (read == 2 || read == '2') return;
-		else if (read == 0 || read == '0') t.read_requested();
-		else if (read == 1 || read == '1') t.write_requested();
-		else throw new IOException("protocol error!");
-		System.out.write(0);
-		System.out.flush();;
-	    } while(true);
-	} catch(IOException e){
-	    System.err.println("ERROR: subprocessing exits on IO exception");
+	    logfile.createNewFile();
+	    try (FileOutputStream log_out = new FileOutputStream(logfile)){
+		try {
+		    do{
+			int read = System.in.read();
+			if (read == 2 || read == '2') return;
+			else if (read == 0 || read == '0') t.read_requested();
+			else if (read == 1 || read == '1') t.write_requested();
+			else throw new IOException("protocol error!");
+			System.out.write(0);
+			System.out.flush();;
+		    } while(true);
+		} catch(IOException e){
+		    PrintWriter logout_writer = new PrintWriter(log_out);
+		    logout_writer.println("ERROR: subprocessing exits on IO exception");
+		    e.printStackTrace(logout_writer);
+		}
+	    }
+	}
+	catch(FileNotFoundException e){
+	    /*Basically impossible, we just created it!*/
+	    throw new Error(e);
+	}
+	catch(IOException e){
+	    System.err.println("ERROR: could not find, create, or write to log file");
 	}
     }
 }
